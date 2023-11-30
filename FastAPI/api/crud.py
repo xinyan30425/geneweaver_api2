@@ -17,7 +17,7 @@ from geneweaver_boolean_algebra.src.schema import BooleanAlgebraInput
 
 # retrieves a single geneset by its geneset_id from the database
 def get_geneset(db: Session, geneset_id: int):
-    return db.query(models.GeneSet).filter(models.GeneSet.id == geneset_id).first() 
+    return db.query(models.GeneSet).filter(models.GeneSet.geneweaver_id == geneset_id).first() 
 # db.query(models.GeneSet) creates a SQLAlchemy query object to query the GeneSet model.
 #.filter(models.GeneSet.id == geneset_id) filters the query to only include the geneset with the matching ID.
 #.first() returns the first result of the query or None if no result is found.

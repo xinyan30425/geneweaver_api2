@@ -18,9 +18,7 @@ class GeneSetFileRow(BaseModel):
     # gene_symbol: Optional[str] = Field(alias='Gene Symbol', default=None)
     mgi: str = Field(..., alias='MGI')
     hgnc: str = Field(..., alias='HGNC')
-    print("aaaaaaaaaaaaaaaaaaaaaaaa")
-    print(geneweaver_id)
-    print("aaaaaaaaaaaaaaaaaaaaaaaa")
+
     # RGD: str = Field(..., alias='RGD')
     # ZFIN: str = Field(..., alias='ZFIN')
     # FlyBase: str = Field(..., alias='FlyBase')
@@ -57,7 +55,7 @@ class GeneSetCreate(BaseModel):
         orm_mode = True
     
 class GeneSetUpdate(BaseModel):
-    gene_weaver_id: Optional[int]
+    geneweaver_id: Optional[int]
     entrez: Optional[int]
     ensembl_gene: Optional[str]
     # gene_symbol: Optional[str]
@@ -69,7 +67,7 @@ class GeneSetUpdate(BaseModel):
 # This class is used to define the structure of the response when a geneset is returned
 class GeneSet(BaseModel):
     id: int
-    gene_weaver_id: int
+    geneweaver_id: int
     entrez: Optional[int]
     ensembl_gene: Optional[str]
     # gene_symbol: Optional[str]
@@ -86,9 +84,9 @@ class BooleanAlgebraInput(BaseModel):
     
 class GeneSet(BaseModel):
     id: int
-    name: str
-    description: Optional[str] = None
-    genes: List[str]
+    geneweaver_id: int
+    entrez: Optional[int]
+    ensembl_gene: Optional[str]
 
     class Config:
         orm_mode = True
