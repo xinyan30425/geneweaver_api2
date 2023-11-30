@@ -1,0 +1,10 @@
+.coverage
+.idea
+.python-version
+dist/
+__pycache__/
+*.py[cod]
+.ruff_cache
+.pytest_cache
+.mypy_cache
+

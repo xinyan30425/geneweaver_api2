@@ -1,0 +1,41 @@
+__init__.py:
+
+This is an initializer file for a Python module or package. 
+When present in a directory, it tells Python that the directory should be treated as a package. 
+It can be empty or contain initialization code for the package.
+
+
+crud.py (Create, Read, Update, Delete):
+
+This file usually contains the functions that directly interact with the database, 
+performing the basic operations: creating, reading, updating, and deleting records. 
+It serves as a separation layer between the database models and the API endpoints, 
+encapsulating the logic for database operations.
+
+
+database.py:
+
+Here define the database connection and session management. 
+For SQLAlchemy, this would typically include the engine, session, and base declarative class used to define models.
+
+
+endpoints.py:
+
+This file contains the API route definitions. 
+Each function in this file corresponds to an endpoint in your API, 
+defining the HTTP method (like GET, POST, PUT, DELETE), path, request and response models, and the business logic to be executed when the endpoint is called.
+
+models.py:
+
+Defines the data models for your application. 
+These are typically classes that SQLAlchemy uses to map objects to database tables. 
+Each class corresponds to a table in the database, and each attribute represents a column.
+
+schemas.py:
+
+Contains Pydantic models that define the structure of requests and responses for your API. 
+These models are used for input validation, serialization, and documentation generation. 
+They are usually based on the data models but can be tailored to expose or require different fields when interacting with the API.
+
+activate virtual environment:source FastAPI/myenv/bin/activate
+get into the FastAPI folder and run the app: cd FastAPI uvicorn run:app --reload

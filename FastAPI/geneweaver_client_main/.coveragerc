@@ -1,0 +1,7 @@
+[run]
+source =
+    src/geneweaver
+omit =
+    src/geneweaver/client/**/*legacy*
+    src/geneweaver/client/*legacy*
+    src/geneweaver/client/cli/alpha/*
