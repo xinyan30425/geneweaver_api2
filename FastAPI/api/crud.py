@@ -8,6 +8,10 @@ from uuid import uuid4
 from .models import AnalysisRun
 from .database import SessionLocal
 from .models import AnalysisRun
+from sqlalchemy import Column, Integer, String, JSON  # Import JSON from sqlalchemy
+from sqlalchemy.ext.declarative import declarative_base
+import json
+
 
 import sys 
 from pathlib import Path
@@ -26,12 +30,37 @@ def get_geneset(db: Session, geneset_id: int):
 def get_genesets(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.GeneSet).offset(skip).limit(limit).all()
 
-# creates a new geneset in the database
-def create_geneset(db: Session, geneset: schemas.GeneSetCreate):
-    db_geneset = models.GeneSet(**geneset.dict()) #creates a dictionary of the new data, excluding any fields that were not set 
-    db.add(db_geneset)
-    db.commit()
-    db.refresh(db_geneset)
+#creates a new geneset in the database
+# def create_geneset(db: Session, geneset: schemas.GeneSetCreate):
+#     db_geneset = models.GeneSet(**geneset.dict()) #creates a dictionary of the new data, excluding any fields that were not set 
+#     db.add(db_geneset)
+#     db.commit()
+#     db.refresh(db_geneset)
+#     return db_geneset
+
+def create_geneset(db: Session, geneset: GeneSetCreate):
+    try:
+        unigene_json = json.dumps({"unigene":geneset.unigene})
+        db_geneset = models.GeneSet(
+            geneweaver_id=geneset.geneweaver_id,
+            entrez=geneset.entrez,
+            ensembl_gene=geneset.ensembl_gene,
+            unigene=unigene_json,
+        )
+        print(f"Unigene JSON: {unigene_json}")
+        db.add(db_geneset)
+        db.commit()
+        db.refresh(db_geneset)
+        return db_geneset
+    except Exception as e:
+        db.rollback()
+        raise e
+
+def get_geneset(db: Session, geneset_id: int):
+    db_geneset = db.query(models.GeneSet).filter(models.GeneSet.geneweaver_id == geneset_id).first()
+    if db_geneset:
+        # Convert JSON string back to a list
+        db_geneset.unigene = json.loads(db_geneset.unigene)
     return db_geneset
 
 

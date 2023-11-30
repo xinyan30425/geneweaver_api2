@@ -1,6 +1,6 @@
 # models.py
 
-from sqlalchemy import Column, Integer, String, Enum
+from sqlalchemy import Column, Integer, String, Enum, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from .database import Base
@@ -40,12 +40,8 @@ class GeneSet(Base):
     geneweaver_id = Column(Integer, unique=True, index=True)
     entrez = Column(String)
     ensembl_gene = Column(String)
-    ensembl_protein = Column(String)
-    ensembl_transcript = Column(String)
     unigene = Column(String)
-    # gene_symbol = Column(String,nullable=True)
-    mgi= Column(String)
-    hgnc = Column(String)
+
     
 
     # If you want to link to AnalysisRun

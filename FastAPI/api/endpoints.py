@@ -3,6 +3,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Body, File,UploadFile,HTTPException
 from sqlalchemy.orm import Session
+import json
 # Importing CRUD operations and schema models from the local modules.
 from .crud import get_geneset, get_genesets, create_geneset, update_geneset, delete_geneset,perform_boolean_algebra
 from .schemas import GeneSetCreate, GeneSetUpdate, GeneSet,GeneSetFileRow,AnalysisRunSchema
@@ -94,6 +95,7 @@ def boolean_algebra_endpoint(
         description="Result of Boolean Algebra operation",
         genes=result_genes
     )
+    
 # Defining an endpoint for uploading genesets through a file.
 @router.post("/upload-genesets/", status_code=201)
 async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(get_db)):
@@ -108,6 +110,8 @@ async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(ge
         try:
             # Assuming 'Entrez' field is an integer and present in every row
             entrez_value = int(row.get('Entrez', '')) if row.get('Entrez', '') else None
+            # Parse the 'Unigene' field and convert it to a list
+            unigene_list = row.get('Unigene', '').split('|') if row.get('Unigene') else []
             # Split 'Gene Symbol' by pipe character if it exists and is not empty
             # gene_symbol_list = []
             # gene_symbol_str = row.get('Gene Symbol', '')
@@ -117,9 +121,7 @@ async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(ge
             #         # Join the list into a single string
             #         gene_symbol_str = ''.join(gene_symbol_str)
             #     gene_symbol_list.extend(gene_symbol_str.split('|'))
-            #     gene_symbol_list.extend(gene_symbol_str.split('-'))
-        
-            
+            #     gene_symbol_list.extend(gene_symbol_str.split('-'))   
             # You may need to adjust the following fields to match the columns of your file exactly.
             geneset_create = GeneSetCreate(
                 geneweaver_id=int(row.get('GeneWeaver ID', 0)),
@@ -127,10 +129,7 @@ async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(ge
                 ensembl_gene=row.get('Ensembl Gene', ''),
                 ensembl_protein=row.get('Ensembl Protein', ''),
                 ensembl_transcript=row.get('Ensembl Transcript', ''),
-                unigene=row.get('Unigene', ''),
-                # gene_symbol=gene_symbol_list,
-                mgi=row.get('MGI', ''),
-                hgnc=row.get('HGNC', ''),
+                unigene=unigene_list
             )
             create_geneset(db, geneset_create)
 
@@ -165,6 +164,15 @@ def cancel_run_endpoint(run_id: int, db: Session = Depends(get_db)):
     if not run:
         raise HTTPException(status_code=404, detail="Analysis run not found or not cancellable")
     return run
+
+
+# Endpoint to cancel a run
+# @router.get("/analysis-runs/{run_id}", response_model=AnalysisRunSchema)
+# def cancel_run_endpoint(run_id: int, db: Session = Depends(get_db)):
+#     run = cancel_run(db, run_id)
+#     if not run:
+#         raise HTTPException(status_code=404, detail="Analysis run not found or not cancellable")
+#     return run
 
     
 

@@ -2,7 +2,7 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 # __author__ = '__Jack__'
-
+import json
 import time
 import uvicorn
 from fastapi import FastAPI, Request
@@ -99,7 +99,8 @@ app.add_middleware(
 # Including your API routers
 app.include_router(api_router, prefix='/api', tags=['GeneSets'])
 
-
+test_list = ['Hs.233757', 'Hs.489142']
+print(json.dumps(test_list))
 
 if __name__ == '__main__':
     uvicorn.run('run:app', host='0.0.0.0', port=8000, reload=True, debug=True, workers=1) 
