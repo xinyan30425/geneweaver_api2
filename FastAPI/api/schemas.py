@@ -27,20 +27,13 @@ class GeneSetFileRow(BaseModel):
     # miRBase: str = Field(..., alias='miRBase')
     # CGNC: str = Field(..., alias='CGNC')
 
-# This class is used to define the structure of the request to create a new geneset
-# class GeneSetCreate(BaseModel):
-#     name: str
-#     description: Optional[str] = None
-#     genes: List[str]
-    
+  
 # This class is used to define the structure of the request to create a new geneset  
 class GeneSetCreate(BaseModel):
     geneweaver_id: Optional[int] = Field(alias='GeneWeaver ID')
     entrez: Optional[int] = Field(alias='Entrez')
     ensembl_gene: Optional[str] = Field(alias='Ensembl Gene')
     unigene: List[str] = Field(default_factory=list, alias='Unigene')
-    
-
     # gene_symbol: Optional[str] = Field(alias='Gene Symbol')
 
     # Method to create a GeneSetCreate instance from GeneSetFileRow
@@ -70,17 +63,6 @@ class GeneSetUpdate(BaseModel):
     class Config:
         orm_mode = True
 
-# This class is used to define the structure of the response when a geneset is returned
-class GeneSet(BaseModel):
-    id: int
-    geneweaver_id: int
-    entrez: Optional[int]
-    ensembl_gene: Optional[str]
-    # gene_symbol: Optional[str]
-    unigene: Optional[dict]
-
-    class Config:
-        orm_mode = True
 
 class BooleanAlgebraInput(BaseModel):
     type: BooleanAlgebraType
@@ -94,11 +76,14 @@ class GeneSet(BaseModel):
     entrez: Optional[int]
     ensembl_gene: Optional[str]
     unigene: Optional[dict]
-    
 
     class Config:
         orm_mode = True
-        
+       
+class BooleanAlgebraRequest(BaseModel):
+    operation: str  # "intersection", "union", or "symmetric_difference"
+    gene_weaver_ids: List[int]  # List of GeneWeaver IDs to perform the operation on
+ 
 class AnalysisRunSchema(BaseModel):
     id:int
     status: RunStatus
