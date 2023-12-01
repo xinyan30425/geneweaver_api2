@@ -5,14 +5,15 @@ from fastapi import APIRouter, Depends, HTTPException, Body, File,UploadFile,HTT
 from sqlalchemy.orm import Session
 import json
 # Importing CRUD operations and schema models from the local modules.
-from .crud import get_geneset, get_genesets, create_geneset, update_geneset, delete_geneset,perform_boolean_algebra
-from .schemas import GeneSetCreate, GeneSetUpdate, GeneSet,BooleanAlgebraRequest,GeneSetFileRow,AnalysisRunSchema
+from .crud import get_geneset, get_genesets, create_geneset, update_geneset, delete_geneset,get_run_result,cancel_run,get_run,get_all_runs,create_analysis_run,perform_boolean_algebra
+from .schemas import GeneSetCreate, GeneSetUpdate, GeneSet,BooleanAlgebraRequest,GeneSetFileRow,AnalysisRunSchema,AnalysisResultSchema
 from .database import get_db 
 import csv
 import io
 from .database import SessionLocal,get_db
 from pydantic import ValidationError
 from .models import GeneSet as SQLAGeneSet
+
 
 
 # Adding the path to sys.path allows Python to find modules in a different directory.
@@ -30,6 +31,48 @@ from geneweaver_boolean_algebra.src.symmetric_difference import symmetric_differ
 
 # Creating an API router which will contain all the endpoint definitions.
 router = APIRouter()
+
+# Defining an endpoint for uploading genesets through a file.
+@router.post("/upload-genesets/", status_code=201)
+async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    if not file.filename.endswith('.txt'):
+        raise HTTPException(status_code=400, detail="Invalid file format. Only .txt files are accepted.")
+    
+    content = await file.read()
+    content_str = content.decode("utf-8")
+    reader = csv.DictReader(io.StringIO(content_str), delimiter='\t')
+
+    for row in reader:
+        try:
+            # Assuming 'Entrez' field is an integer and present in every row
+            entrez_value = int(row.get('Entrez', '')) if row.get('Entrez', '') else None
+            # Parse the 'Unigene' field and convert it to a list
+            unigene_list = row.get('Unigene', '').split('|') if row.get('Unigene') else []
+            # Split 'Gene Symbol' by pipe character if it exists and is not empty
+            # gene_symbol_list = []
+            # gene_symbol_str = row.get('Gene Symbol', '')
+            # if gene_symbol_str:
+            #     if isinstance(gene_symbol_str, list):
+            #         # Join the list into a single string
+            #         gene_symbol_str = ''.join(gene_symbol_str)
+            #     gene_symbol_list.extend(gene_symbol_str.split('|'))
+            #     gene_symbol_list.extend(gene_symbol_str.split('-'))   
+            # You may need to adjust the following fields to match the columns of your file exactly.
+            geneset_create = GeneSetCreate(
+                geneweaver_id=int(row.get('GeneWeaver ID', 0)),
+                entrez=entrez_value,
+                ensembl_gene=row.get('Ensembl Gene', ''),
+                ensembl_protein=row.get('Ensembl Protein', ''),
+                ensembl_transcript=row.get('Ensembl Transcript', ''),
+                unigene=unigene_list
+            )
+            create_geneset(db, geneset_create)
+
+        except ValidationError as e:
+            # Handle the validation error
+            print(f"Validation error for row: {row}, Error: {e}")
+
+    return {"status": "success", "filename": file.filename}
 
 # Defining an endpoint to create a new geneset.
 @router.post("/genesets/", response_model=GeneSet)
@@ -83,48 +126,6 @@ def update_geneset_endpoint(geneset_id: int, geneset: GeneSetUpdate, db: Session
         raise HTTPException(status_code=404, detail="GeneSet not found")
     return db_geneset
 
-# Defining an endpoint for uploading genesets through a file.
-@router.post("/upload-genesets/", status_code=201)
-async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    if not file.filename.endswith('.txt'):
-        raise HTTPException(status_code=400, detail="Invalid file format. Only .txt files are accepted.")
-    
-    content = await file.read()
-    content_str = content.decode("utf-8")
-    reader = csv.DictReader(io.StringIO(content_str), delimiter='\t')
-
-    for row in reader:
-        try:
-            # Assuming 'Entrez' field is an integer and present in every row
-            entrez_value = int(row.get('Entrez', '')) if row.get('Entrez', '') else None
-            # Parse the 'Unigene' field and convert it to a list
-            unigene_list = row.get('Unigene', '').split('|') if row.get('Unigene') else []
-            # Split 'Gene Symbol' by pipe character if it exists and is not empty
-            # gene_symbol_list = []
-            # gene_symbol_str = row.get('Gene Symbol', '')
-            # if gene_symbol_str:
-            #     if isinstance(gene_symbol_str, list):
-            #         # Join the list into a single string
-            #         gene_symbol_str = ''.join(gene_symbol_str)
-            #     gene_symbol_list.extend(gene_symbol_str.split('|'))
-            #     gene_symbol_list.extend(gene_symbol_str.split('-'))   
-            # You may need to adjust the following fields to match the columns of your file exactly.
-            geneset_create = GeneSetCreate(
-                geneweaver_id=int(row.get('GeneWeaver ID', 0)),
-                entrez=entrez_value,
-                ensembl_gene=row.get('Ensembl Gene', ''),
-                ensembl_protein=row.get('Ensembl Protein', ''),
-                ensembl_transcript=row.get('Ensembl Transcript', ''),
-                unigene=unigene_list
-            )
-            create_geneset(db, geneset_create)
-
-        except ValidationError as e:
-            # Handle the validation error
-            print(f"Validation error for row: {row}, Error: {e}")
-
-    return {"status": "success", "filename": file.filename}
-
 def extract_genes_from_json(json_data: str) -> Set[str]:
     # Convert JSON string to a Python object (list in this case)
     data = json.loads(json_data)
@@ -159,3 +160,36 @@ async def boolean_algebra_endpoint(
         raise HTTPException(status_code=400, detail="Invalid operation")
 
     return {"result": list(result)}
+
+
+
+@router.post("/analysis-runs/", response_model=AnalysisRunSchema)
+def create_run(db: Session = Depends(get_db)):
+    return create_analysis_run(db)
+
+@router.get("/analysis-runs/", response_model=List[AnalysisRunSchema])
+def read_all_runs(db: Session = Depends(get_db)):
+    return get_all_runs(db)
+
+@router.get("/analysis-runs/{run_id}", response_model=AnalysisRunSchema)
+def read_run(run_id: int, db: Session = Depends(get_db)):
+    run = get_run(db, run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail="Run not found")
+    return run
+
+@router.delete("/analysis-runs/{run_id}", response_model=AnalysisRunSchema)
+def cancel_run(run_id: int, db: Session = Depends(get_db)):
+    run_to_cancel = cancel_run(db, run_id)
+    if run_to_cancel is None:
+        raise HTTPException(status_code=404, detail="Run not found or not cancellable")
+    return run_to_cancel
+
+@router.get("/analysis-runs/{run_id}/result", response_model=AnalysisResultSchema)
+def get_result(run_id: int, db: Session = Depends(get_db)):
+    result = get_run_result(db, run_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Result not found for the run")
+    return result
+
+

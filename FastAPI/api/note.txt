@@ -39,3 +39,68 @@ They are usually based on the data models but can be tailored to expose or requi
 
 activate virtual environment:source FastAPI/myenv/bin/activate
 get into the FastAPI folder and run the app: cd FastAPI uvicorn run:app --reload
+
+access link: http://127.0.0.1:8000/docs
+
+To use your FastAPI application with the endpoints you've created, follow this workflow:
+
+Start your FastAPI server: In your terminal, navigate to the directory where your main.py (or equivalent) is located and run the FastAPI server using Uvicorn. For example:
+
+bash
+Copy code
+uvicorn main:app --reload
+The --reload flag makes the server restart after code changes. Only use this in development.
+
+Upload your dataset:
+
+Use the /api/upload-genesets/ endpoint to upload your dataset file. This will parse the file and create geneset records in the database.
+Create an Analysis Run:
+
+If you have a separate process for analysis, you might start by posting to /api/analysis-runs/ to create a new analysis run.
+Get all Genesets:
+
+To see all the genesets you've uploaded, use the GET /api/genesets/ endpoint.
+Create a Geneset:
+
+If you need to add more genesets individually, use the POST /api/genesets/ endpoint.
+Get a Geneset by ID:
+
+To retrieve a specific geneset, use GET /api/genesets/{geneset_id} with the appropriate ID.
+Update a Geneset:
+
+If you need to update a geneset, use the PUT /api/genesets/{geneset_id} endpoint.
+Delete a Geneset:
+
+To remove a geneset, use DELETE /api/genesets/{geneset_id}.
+Perform Boolean Algebra Operations:
+
+To execute boolean algebra operations on the genesets, use the POST /api/boolean-algebra/ endpoint.
+Manage Analysis Runs:
+
+Use GET /api/analysis-runs/ to list all runs.
+Use GET /api/analysis-runs/{run_id} to get the status of a specific run.
+Use DELETE /api/analysis-runs/{run_id} to cancel a run if needed.
+Remember to replace {geneset_id} and {run_id} with actual IDs from your database records.
+
+To perform Boolean Algebra analysis on the uplaoded dataset using the Boolean Algebra tool:
+1. Parsing the data:parse the data from the text file into a format that can be processed by the Boolean Algebra tool.
+Reading the file, extracting the relevant columns, and converting them into sets of geneset
+2. Boolean Algebra analysis will be performed on the Unigene column data, as the set of genes for each GeneWeaver ID.
+Each Unigene entry contains a list of genes separated by the pip character "|", which would split into individual genes to create a set
+3. Prepare "BooleanAlgebraInput" instances for each Boolean algebra operation will be performed.
+This will include specifying the operation type (Union, intersection, difference) and provide the list of gene sets to process
+4. Running the analysis: instance the boolean algebra tool, perform the analysis and return the result
+
+Unigene is a database maintained by the National Center for Biotechnology Information for experimental research, 
+which provided a set of non-redundant sequences of genes or expressed sequence tages (ESTs)
+The Unigene column in the dataset contain a list of identifiers, seperated by the pip charactor "|"
+Each identifier in the Unigene column represents a unique cluster of gene expression or sequence data:
+each ID corresponds to a particular set of gene expression or sequence data that is considered unique within the database. 
+Data are grouped based on sequence similarity, which implies that they may represent that same gene or similar genes. 
+The IDs point to a collection of sequences from mRNA and ESTs that appear to come from the same transcription locus(gene or genomic region)
+
+
+{
+  "operation": "intersection",
+  "gene_weaver_ids": [65066, 65243, 65469]
+}

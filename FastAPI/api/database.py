@@ -1,10 +1,9 @@
 # database.py
 
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+
 from sqlalchemy.orm import sessionmaker
-
-
+from .models import GeneSet, AnalysisRun, AnalysisResult,Base
 
 # The database URL for SQLite, it's a local file
 DATABASE_URL = "sqlite:///./geneweaver.db"
@@ -22,12 +21,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # In the declarative system, the base class maintains a catalog of classes and tables
 # relating to that base
-Base = declarative_base()
-
-# Create the tables
-Base.metadata.create_all(bind=engine)
-print("Tables created successfully.")
-
+# Base = declarative_base()
 
 # Dependency to use in FastAPI endpoints to get a database session
 def get_db():
@@ -36,3 +30,8 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+# Create the tables
+# Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine, tables=[GeneSet.__table__, AnalysisRun.__table__, AnalysisResult.__table__])
+print("Tables created successfully.")

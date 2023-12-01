@@ -2,7 +2,7 @@
 # schemas.py
 
 from pydantic import BaseModel,Field
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict,Any
 from .models import RunStatus
 
 from geneweaver_boolean_algebra.src.schema import BooleanAlgebraType
@@ -91,7 +91,14 @@ class AnalysisRunSchema(BaseModel):
     class Config:
         or_mode = True
     
-    
+class AnalysisRunSchema(BaseModel):
+    id: int
+    status: str
+
+class AnalysisResultSchema(BaseModel):
+    id: int
+    run_id: int
+    result_data: Optional[Any]
     
 
 
