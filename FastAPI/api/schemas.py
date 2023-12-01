@@ -4,7 +4,7 @@
 from pydantic import BaseModel,Field
 from typing import List, Optional, Dict,Any
 from .models import RunStatus
-
+from datetime import datetime
 from geneweaver_boolean_algebra.src.schema import BooleanAlgebraType
 
 # Add a class for parsing the uploaded file's data
@@ -87,18 +87,19 @@ class BooleanAlgebraRequest(BaseModel):
 class AnalysisRunSchema(BaseModel):
     id:int
     status: RunStatus
+    start_time:Optional[datetime] = None
+    end_time:Optional[datetime] = None
     result: Optional[str] = None
-    class Config:
-        or_mode = True
-    
-class AnalysisRunSchema(BaseModel):
-    id: int
-    status: str
+    class Config: # set in the Config class to allow ORM models to be parsed automatically by Pydantic
+        orm_mode = True
 
 class AnalysisResultSchema(BaseModel):
     id: int
     run_id: int
     result_data: Optional[Any]
+    
+    class Config:
+        orm_mode = True
     
 
 

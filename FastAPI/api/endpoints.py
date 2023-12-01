@@ -1,11 +1,12 @@
 #endpoint.py
 
 from typing import List,Set
-from fastapi import APIRouter, Depends, HTTPException, Body, File,UploadFile,HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, Body, File,UploadFile,HTTPException,BackgroundTasks
+from sqlalchemy.orm import Session,joinedload
 import json
 # Importing CRUD operations and schema models from the local modules.
-from .crud import get_geneset, get_genesets, create_geneset, update_geneset, delete_geneset,get_run_result,cancel_run,get_run,get_all_runs,create_analysis_run,perform_boolean_algebra
+from .crud import get_geneset, create_geneset, update_geneset, delete_geneset,get_run_result,get_run,get_all_runs,create_analysis_run,perform_boolean_algebra_analysis
+from .crud import cancel_run as crud_cancel_run
 from .schemas import GeneSetCreate, GeneSetUpdate, GeneSet,BooleanAlgebraRequest,GeneSetFileRow,AnalysisRunSchema,AnalysisResultSchema
 from .database import get_db 
 import csv
@@ -13,6 +14,8 @@ import io
 from .database import SessionLocal,get_db
 from pydantic import ValidationError
 from .models import GeneSet as SQLAGeneSet
+from .crud import update_run_status_and_time,get_geneset_unigenes,perform_boolean_algebra_analysis
+from .models import AnalysisRun,RunStatus
 
 
 
@@ -126,20 +129,7 @@ def update_geneset_endpoint(geneset_id: int, geneset: GeneSetUpdate, db: Session
         raise HTTPException(status_code=404, detail="GeneSet not found")
     return db_geneset
 
-def extract_genes_from_json(json_data: str) -> Set[str]:
-    # Convert JSON string to a Python object (list in this case)
-    data = json.loads(json_data)
-    # Extract the unigene list and convert it to a set
-    return set(data['unigene'])
-
-def get_geneset_unigenes(db: Session, gene_weaver_id: int) -> Set[str]:
-    # Fetch the geneset by GeneWeaver ID and extract the unigenes
-    geneset = db.query(SQLAGeneSet).filter(SQLAGeneSet.geneweaver_id == gene_weaver_id).first()
-    if geneset and geneset.unigene:
-        return extract_genes_from_json(geneset.unigene)
-    else:
-        raise HTTPException(status_code=404, detail=f"GeneSet with GeneWeaver ID {gene_weaver_id} not found or unigene data is empty")
-    
+   
 @router.post("/boolean-algebra/")
 async def boolean_algebra_endpoint(
     request: BooleanAlgebraRequest, 
@@ -161,11 +151,27 @@ async def boolean_algebra_endpoint(
 
     return {"result": list(result)}
 
+@router.post("/run-boolean-algebra/")
+async def perform_boolean_algebra_endpoint(
+    background_tasks: BackgroundTasks,
+    request: BooleanAlgebraRequest, 
+    db: Session = Depends(get_db)):
+    
+    # Create a new analysis run and get its ID
+    new_run = create_analysis_run(db)
+    run_id = new_run.id
 
+    # Add the analysis task to background tasks
+    background_tasks.add_task(
+        perform_boolean_algebra_analysis, 
+        run_id, 
+        db, 
+        request.gene_weaver_ids, 
+        request.operation
+    )
 
-@router.post("/analysis-runs/", response_model=AnalysisRunSchema)
-def create_run(db: Session = Depends(get_db)):
-    return create_analysis_run(db)
+    return {"message": "Analysis started", "run_id": run_id}
+
 
 @router.get("/analysis-runs/", response_model=List[AnalysisRunSchema])
 def read_all_runs(db: Session = Depends(get_db)):
@@ -180,10 +186,13 @@ def read_run(run_id: int, db: Session = Depends(get_db)):
 
 @router.delete("/analysis-runs/{run_id}", response_model=AnalysisRunSchema)
 def cancel_run(run_id: int, db: Session = Depends(get_db)):
-    run_to_cancel = cancel_run(db, run_id)
-    if run_to_cancel is None:
-        raise HTTPException(status_code=404, detail="Run not found or not cancellable")
-    return run_to_cancel
+    try:
+        run_to_cancel = crud_cancel_run(db, run_id)
+        if run_to_cancel is None:
+            raise HTTPException(status_code=404, detail="Run not found")
+        return run_to_cancel
+    except HTTPException as e:
+        raise e
 
 @router.get("/analysis-runs/{run_id}/result", response_model=AnalysisResultSchema)
 def get_result(run_id: int, db: Session = Depends(get_db)):
