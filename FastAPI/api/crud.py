@@ -142,8 +142,6 @@ def perform_boolean_algebra_analysis(task_id: int, db: Session, gene_weaver_ids:
         raise e
         
     
-def get_run(db: Session, run_id: int):
-    return db.query(models.AnalysisRun).filter(models.AnalysisRun.id == run_id).first()
 
 def update_run_status_and_time(db: Session, run_id: int, status: str, start_time: bool = False, end_time: bool = False):
     """Update the status and time fields of an analysis run."""
@@ -197,3 +195,12 @@ def save_analysis_result(db: Session, run_id: int, result_data: List[str]):
 
 def get_run_result(db: Session, run_id: int):
     return db.query(models.AnalysisResult).filter(models.AnalysisResult.run_id == run_id).first()
+
+
+def get_runstatus(db: Session, run_id: int) -> str:
+    """Fetches the status of an analysis run by its ID."""
+    run = db.query(models.AnalysisRun).filter(models.AnalysisRun.id == run_id).first()
+    if run:
+        return run.status.value  # Return the status as a string
+    else:
+        return "Not Found"  # Or you can raise an HTTPException for a not found error

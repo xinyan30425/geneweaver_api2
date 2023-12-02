@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Body, File,UploadFile,HTT
 from sqlalchemy.orm import Session,joinedload
 import json
 # Importing CRUD operations and schema models from the local modules.
-from .crud import get_geneset, create_geneset, update_geneset, delete_geneset,get_run_result,get_run,get_all_runs,create_analysis_run,perform_boolean_algebra_analysis
+from .crud import get_geneset, create_geneset, update_geneset, delete_geneset,get_run_result,get_runstatus,get_all_runs,create_analysis_run,perform_boolean_algebra_analysis
 from .crud import cancel_run as crud_cancel_run
 from .schemas import GeneSetCreate, GeneSetUpdate, GeneSet,BooleanAlgebraRequest,GeneSetFileRow,AnalysisRunSchema,AnalysisResultSchema
 from .database import get_db 
@@ -51,16 +51,6 @@ async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(ge
             entrez_value = int(row.get('Entrez', '')) if row.get('Entrez', '') else None
             # Parse the 'Unigene' field and convert it to a list
             unigene_list = row.get('Unigene', '').split('|') if row.get('Unigene') else []
-            # Split 'Gene Symbol' by pipe character if it exists and is not empty
-            # gene_symbol_list = []
-            # gene_symbol_str = row.get('Gene Symbol', '')
-            # if gene_symbol_str:
-            #     if isinstance(gene_symbol_str, list):
-            #         # Join the list into a single string
-            #         gene_symbol_str = ''.join(gene_symbol_str)
-            #     gene_symbol_list.extend(gene_symbol_str.split('|'))
-            #     gene_symbol_list.extend(gene_symbol_str.split('-'))   
-            # You may need to adjust the following fields to match the columns of your file exactly.
             geneset_create = GeneSetCreate(
                 geneweaver_id=int(row.get('GeneWeaver ID', 0)),
                 entrez=entrez_value,
@@ -78,29 +68,29 @@ async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(ge
     return {"status": "success", "filename": file.filename}
 
 # Defining an endpoint to create a new geneset.
-@router.post("/genesets/", response_model=GeneSet)
-def create_geneset_endpoint(geneset: GeneSetCreate, db: Session = Depends(get_db)):
-    return create_geneset(db, geneset)
+# @router.post("/genesets/", response_model=GeneSet)
+# def create_geneset_endpoint(geneset: GeneSetCreate, db: Session = Depends(get_db)):
+#     return create_geneset(db, geneset)
 
 # Defining an endpoint to read all genesets with pagination.
-@router.get("/genesets/", response_model=List[GeneSet])
-def read_genesets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    genesets = get_genesets(db, skip=skip, limit=limit)
-    return genesets
+# @router.get("/genesets/", response_model=List[GeneSet])
+# def read_genesets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+#     genesets = get_genesets(db, skip=skip, limit=limit)
+#     return genesets
 
 # Defining an endpoint to read a specific geneset by its ID.
-@router.get("/genesets/{geneset_id}", response_model=GeneSet)
-def read_geneset(geneset_id: int, db: Session = Depends(get_db)):
-    db_geneset = get_geneset(db, geneset_id)
-    if db_geneset is None:
-        raise HTTPException(status_code=404, detail="GeneSet not found")
-    return db_geneset
+# @router.get("/genesets/{geneset_id}", response_model=GeneSet)
+# def read_geneset(geneset_id: int, db: Session = Depends(get_db)):
+#     db_geneset = get_geneset(db, geneset_id)
+#     if db_geneset is None:
+#         raise HTTPException(status_code=404, detail="GeneSet not found")
+#     return db_geneset
 
 # Defining an endpoint to read all genesets with pagination.
-@router.get("/genesets/", response_model=List[GeneSet])
-def get_all_genesets(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
-    genesets = get_genesets(db, skip=skip, limit=limit)
-    return genesets
+# @router.get("/genesets/", response_model=List[GeneSet])
+# def get_all_genesets(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
+#     genesets = get_genesets(db, skip=skip, limit=limit)
+#     return genesets
 
 # Defining an endpoint to read a specific geneset by its ID.
 @router.get("/genesets/{geneset_id}", response_model=GeneSet)
@@ -177,12 +167,6 @@ async def perform_boolean_algebra_endpoint(
 def read_all_runs(db: Session = Depends(get_db)):
     return get_all_runs(db)
 
-@router.get("/analysis-runs/{run_id}", response_model=AnalysisRunSchema)
-def read_run(run_id: int, db: Session = Depends(get_db)):
-    run = get_run(db, run_id)
-    if run is None:
-        raise HTTPException(status_code=404, detail="Run not found")
-    return run
 
 @router.delete("/analysis-runs/{run_id}", response_model=AnalysisRunSchema)
 def cancel_run(run_id: int, db: Session = Depends(get_db)):
@@ -193,6 +177,19 @@ def cancel_run(run_id: int, db: Session = Depends(get_db)):
         return run_to_cancel
     except HTTPException as e:
         raise e
+    
+@router.get("/analysis-runs/{run_id}", response_model=AnalysisRunSchema)
+def get_run_status(run_id: int, db: Session = Depends(get_db)):
+    status = get_runstatus(db, run_id)
+    if status == "not Found":
+        raise HTTPException(status_code=404, detail="Run not found")
+     # Construct a response that matches the AnalysisRunSchema
+    response = {
+        "id":run_id,
+        "status": status,  # Assuming status is an enum and .value gets the string representation
+    }
+
+    return response
 
 @router.get("/analysis-runs/{run_id}/result", response_model=AnalysisResultSchema)
 def get_result(run_id: int, db: Session = Depends(get_db)):
