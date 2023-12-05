@@ -1,4 +1,9 @@
 # crud.py
+# This file usually contains the functions that directly interact with the database, 
+# performing the basic operations: creating, reading, updating, and deleting records. 
+# It serves as a separation layer between the database models and the API endpoints, 
+# encapsulating the logic for database operations.
+
 from typing import List,Set,Dict
 from datetime import datetime
 from sqlalchemy.orm import Session
@@ -7,11 +12,10 @@ from .schemas import GeneSetCreate
 from uuid import uuid4
 from .models import AnalysisRun,AnalysisResult,RunStatus
 from .database import SessionLocal
-from fastapi import APIRouter, Depends, HTTPException, Body, File,UploadFile,HTTPException,BackgroundTasks
+from fastapi import HTTPException,HTTPException
 from .models import BooleanAlgebraType
 from .models import GeneSet as SQLAGeneSet
-from sqlalchemy import func,Column, Integer, String, JSON  # Import JSON from sqlalchemy
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import func # Import JSON from sqlalchemy
 import json
 
 import sys 
@@ -23,10 +27,6 @@ from geneweaver_boolean_algebra.src.schema import BooleanAlgebraInput
 # retrieves a single geneset by its geneset_id from the database
 def get_geneset(db: Session, geneset_id: int):
     return db.query(models.GeneSet).filter(models.GeneSet.geneweaver_id == geneset_id).first() 
-
-# # db.query(models.GeneSet) creates a SQLAlchemy query object to query the GeneSet model.
-# def get_genesets(db: Session, skip: int = 0, limit: int = 100):
-#     return db.query(models.GeneSet).offset(skip).limit(limit).all()
 
 #creates a new geneset in the database
 def create_geneset(db: Session, geneset: GeneSetCreate):
@@ -46,7 +46,7 @@ def create_geneset(db: Session, geneset: GeneSetCreate):
     except Exception as e:
         db.rollback()
         raise e
-
+# Get ageneset by its geneweaver_id
 def get_geneset(db: Session, geneset_id: int):
     db_geneset = db.query(models.GeneSet).filter(models.GeneSet.geneweaver_id == geneset_id).first()
     if db_geneset:
@@ -55,7 +55,7 @@ def get_geneset(db: Session, geneset_id: int):
     return db_geneset
 
 
-# updates an existing geneset identified by geneset_id with the data in geneset (an instance of GeneSetUpdate).
+# Updates an existing geneset identified by geneweaver_id with the data in geneset (an instance of GeneSetUpdate).
 def update_geneset(db: Session, geneset_id: int, geneset: schemas.GeneSetUpdate):
     db_geneset = get_geneset(db, geneset_id)
     if db_geneset:
@@ -67,7 +67,7 @@ def update_geneset(db: Session, geneset_id: int, geneset: schemas.GeneSetUpdate)
         db.refresh(db_geneset)
     return db_geneset
 
-# Deletes the geneset with the given geneset_id from the database.
+# Deletes the geneset with the given geneweaver_id from the database.
 def delete_geneset(db: Session, geneset_id: int):
     db_geneset = get_geneset(db, geneset_id)
     if db_geneset:
@@ -75,8 +75,7 @@ def delete_geneset(db: Session, geneset_id: int):
         db.commit()
         return db_geneset
 
-
-# performs a boolean algebra operation specified by operation on a list of genesets identified by geneset_ids.
+# Performs a boolean algebra operation specified by operation on a list of genesets identified by geneweaver_ids.
 def perform_boolean_algebra(db: Session, operation: str, geneset_ids: List[int]) -> Set[str]:
     # Fetch gene sets from the database
     gene_sets = [get_geneset(db,geneset_id) for geneset_id in geneset_ids]
@@ -91,7 +90,6 @@ def perform_boolean_algebra(db: Session, operation: str, geneset_ids: List[int])
     result = boolean_algebra_tool.run(tool_input)
     
     return result.result_geneset_ids
-
 
 # CRUD functions for analysis runs
 def create_analysis_run(db: Session):

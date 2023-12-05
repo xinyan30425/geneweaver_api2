@@ -3,9 +3,7 @@
 from sqlalchemy import Column, Integer, String, Enum, DateTime, JSON,ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from pydantic import BaseModel, Field
 import enum
-# from .enums import RunStatus
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -14,8 +12,7 @@ class BooleanAlgebraType(Enum):
     INTERSECTION = "intersection"
     UNION = "union"
     DIFFERENCE = "difference"
-    
-# Modify GeneSet model as per your requirements  
+ 
 class GeneSet(Base):
     __tablename__ = "genesets"
     
@@ -36,6 +33,7 @@ class RunStatus(enum.Enum):
 class AnalysisRun(Base):
     __tablename__ = 'analysis_runs'
     id = Column(Integer, primary_key=True, index=True)
+    run_id = Column(Integer, ForeignKey('analysis_runs.id'))
     status = Column(Enum(RunStatus), default=RunStatus.PENDING)
     start_time = Column(DateTime(timezone=True), server_default=func.now())  # Auto-set at creation
     end_time = Column(DateTime(timezone=True))  # Set when analysis completes or fails

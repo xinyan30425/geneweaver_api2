@@ -1,7 +1,8 @@
 # database.py
+# Here define the database connection and session management. 
+# For SQLAlchemy, this would typically include the engine, session, and base declarative class used to define models.
 
 from sqlalchemy import create_engine
-
 from sqlalchemy.orm import sessionmaker
 from .models import GeneSet, AnalysisRun, AnalysisResult,Base
 
@@ -19,9 +20,6 @@ engine = create_engine(
 # The class itself is not a database session yet
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# In the declarative system, the base class maintains a catalog of classes and tables
-# relating to that base
-# Base = declarative_base()
 
 # Dependency to use in FastAPI endpoints to get a database session
 def get_db():

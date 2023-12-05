@@ -1,32 +1,30 @@
-#endpoint.py
+# endpoint.py
+# This file contains the API route definitions. 
+# Each function in this file corresponds to an endpoint in the API, 
 
 from typing import List,Set
-from fastapi import APIRouter, Depends, HTTPException, Body, File,UploadFile,HTTPException,BackgroundTasks
-from sqlalchemy.orm import Session,joinedload
+from fastapi import APIRouter, Depends, HTTPException,File,UploadFile,HTTPException,BackgroundTasks
+from sqlalchemy.orm import Session
 import json
 # Importing CRUD operations and schema models from the local modules.
-from .crud import get_geneset, create_geneset, update_geneset, delete_geneset,get_run_result,get_runstatus,get_all_runs,create_analysis_run,perform_boolean_algebra_analysis
+from .crud import get_geneset, create_geneset, delete_geneset,get_run_result,get_runstatus,get_all_runs,create_analysis_run,perform_boolean_algebra_analysis
 from .crud import cancel_run as crud_cancel_run
-from .schemas import GeneSetCreate, GeneSetUpdate, GeneSet,BooleanAlgebraRequest,GeneSetFileRow,AnalysisRunSchema,AnalysisResultSchema
+from .schemas import GeneSetCreate, GeneSetUpdate, GeneSet,BooleanAlgebraRequest,AnalysisRunSchema,AnalysisResultSchema
 from .database import get_db 
 import csv
 import io
 from .database import SessionLocal,get_db
 from pydantic import ValidationError
 from .models import GeneSet as SQLAGeneSet
-from .crud import update_run_status_and_time,get_geneset_unigenes,perform_boolean_algebra_analysis
-from .models import AnalysisRun,RunStatus
-
+from .crud import get_geneset_unigenes,perform_boolean_algebra_analysis
 
 
 # Adding the path to sys.path allows Python to find modules in a different directory.
 import sys 
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent / "FastAPI"))
+
 # Importing the BooleanAlgebra tool and input schema for boolean algebra operations.
-from geneweaver_boolean_algebra.src.tool import BooleanAlgebra,BooleanAlgebraType
-from geneweaver_boolean_algebra.src.schema import BooleanAlgebraInput,BooleanAlgebraOutput
-from geneweaver_boolean_algebra.src.utils import iterable_to_sets
 from geneweaver_boolean_algebra.src.union import union
 from geneweaver_boolean_algebra.src.intersection import intersection
 from geneweaver_boolean_algebra.src.symmetric_difference import symmetric_difference
@@ -47,7 +45,6 @@ async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(ge
 
     for row in reader:
         try:
-            # Assuming 'Entrez' field is an integer and present in every row
             entrez_value = int(row.get('Entrez', '')) if row.get('Entrez', '') else None
             # Parse the 'Unigene' field and convert it to a list
             unigene_list = row.get('Unigene', '').split('|') if row.get('Unigene') else []
@@ -67,31 +64,6 @@ async def upload_genesets(file: UploadFile = File(...), db: Session = Depends(ge
 
     return {"status": "success", "filename": file.filename}
 
-# Defining an endpoint to create a new geneset.
-# @router.post("/genesets/", response_model=GeneSet)
-# def create_geneset_endpoint(geneset: GeneSetCreate, db: Session = Depends(get_db)):
-#     return create_geneset(db, geneset)
-
-# Defining an endpoint to read all genesets with pagination.
-# @router.get("/genesets/", response_model=List[GeneSet])
-# def read_genesets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-#     genesets = get_genesets(db, skip=skip, limit=limit)
-#     return genesets
-
-# Defining an endpoint to read a specific geneset by its ID.
-# @router.get("/genesets/{geneset_id}", response_model=GeneSet)
-# def read_geneset(geneset_id: int, db: Session = Depends(get_db)):
-#     db_geneset = get_geneset(db, geneset_id)
-#     if db_geneset is None:
-#         raise HTTPException(status_code=404, detail="GeneSet not found")
-#     return db_geneset
-
-# Defining an endpoint to read all genesets with pagination.
-# @router.get("/genesets/", response_model=List[GeneSet])
-# def get_all_genesets(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
-#     genesets = get_genesets(db, skip=skip, limit=limit)
-#     return genesets
-
 # Defining an endpoint to read a specific geneset by its ID.
 @router.get("/genesets/{geneset_id}", response_model=GeneSet)
 def get_geneset_endpoint(geneset_id: int, db: Session = Depends(get_db)):
@@ -110,15 +82,6 @@ def delete_geneset_endpoint(geneset_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="GeneSet not found")
     # If the geneset exists, delete it using the CRUD function.
     return delete_geneset(db, geneset_id=geneset_id)
-
-# Defining an endpoint to update a specific geneset by its ID.
-@router.put("/genesets/{geneset_id}", response_model=GeneSet)
-def update_geneset_endpoint(geneset_id: int, geneset: GeneSetUpdate, db: Session = Depends(get_db)):
-    db_geneset = update_geneset(db, geneset_id, geneset)
-    if db_geneset is None:
-        raise HTTPException(status_code=404, detail="GeneSet not found")
-    return db_geneset
-
    
 @router.post("/boolean-algebra/")
 async def boolean_algebra_endpoint(
@@ -133,8 +96,6 @@ async def boolean_algebra_endpoint(
     elif request.operation == "union":
         result = set.union(*geneset_sets)
     elif request.operation == "difference":
-        # Symmetric difference in a context of more than 2 sets can be interpreted in different ways,
-        # here we use one possible interpretation: elements which are in an odd number of sets
         result = set.symmetric_difference(*geneset_sets)
     else:
         raise HTTPException(status_code=400, detail="Invalid operation")
@@ -186,7 +147,7 @@ def get_run_status(run_id: int, db: Session = Depends(get_db)):
      # Construct a response that matches the AnalysisRunSchema
     response = {
         "id":run_id,
-        "status": status,  # Assuming status is an enum and .value gets the string representation
+        "status": status, 
     }
 
     return response

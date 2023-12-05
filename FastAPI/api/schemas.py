@@ -1,5 +1,7 @@
-# This will be a base class for gene set attributes shared among different schemas
+
 # schemas.py
+# Contains Pydantic models that define the structure of requests and responses for the API. 
+# These models are used for input validation, serialization, and documentation generation. 
 
 from pydantic import BaseModel,Field
 from typing import List, Optional, Dict,Any
@@ -18,7 +20,6 @@ class GeneSetFileRow(BaseModel):
     # gene_symbol: Optional[str] = Field(alias='Gene Symbol', default=None)
     # mgi: str = Field(..., alias='MGI')
     # hgnc: str = Field(..., alias='HGNC')
-
     # RGD: str = Field(..., alias='RGD')
     # ZFIN: str = Field(..., alias='ZFIN')
     # FlyBase: str = Field(..., alias='FlyBase')
@@ -34,7 +35,6 @@ class GeneSetCreate(BaseModel):
     entrez: Optional[int] = Field(alias='Entrez')
     ensembl_gene: Optional[str] = Field(alias='Ensembl Gene')
     unigene: List[str] = Field(default_factory=list, alias='Unigene')
-    # gene_symbol: Optional[str] = Field(alias='Gene Symbol')
 
     # Method to create a GeneSetCreate instance from GeneSetFileRow
     @classmethod
@@ -81,7 +81,7 @@ class GeneSet(BaseModel):
         orm_mode = True
        
 class BooleanAlgebraRequest(BaseModel):
-    operation: str  # "intersection", "union", or "symmetric_difference"
+    operation: str  # "intersection", "union", or "difference"
     gene_weaver_ids: List[int]  # List of GeneWeaver IDs to perform the operation on
  
 class AnalysisRunSchema(BaseModel):
