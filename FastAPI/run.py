@@ -1,7 +1,3 @@
-
-#!/usr/bin/python3
-# -*- coding:utf-8 -*-
-# __author__ = '__Jack__'
 import json
 import time
 import uvicorn
@@ -19,11 +15,11 @@ app = FastAPI(title='FastAPI Application', version='1.0.0')
 
 
 @app.middleware('http')
-async def add_process_time_header(request: Request, call_next):  # call_next将接收request请求做为参数
+async def add_process_time_header(request: Request, call_next):  
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
-    response.headers['X-Process-Time'] = str(process_time)  # 添加自定义的以“X-”开头的请求头
+    response.headers['X-Process-Time'] = str(process_time) 
     return response
 
 
@@ -38,7 +34,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Including your API routers
+# API routers
 app.include_router(api_router, prefix='/api', tags=['GeneSets'])
 
 test_list = ['Hs.233757', 'Hs.489142']

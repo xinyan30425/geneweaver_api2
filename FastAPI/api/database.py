@@ -33,3 +33,15 @@ def get_db():
 # Base.metadata.create_all(bind=engine)
 Base.metadata.create_all(bind=engine, tables=[GeneSet.__table__, AnalysisRun.__table__, AnalysisResult.__table__])
 print("Tables created successfully.")
+
+
+# Get a test database session
+def get_test_db():
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    Base.metadata.create_all(bind=engine)  # Create the tables in the in-memory database
+    try:
+        db = TestingSessionLocal()
+        yield db
+    finally:
+        db.close()

@@ -1,4 +1,7 @@
 # models.py
+# Defines the data models for the application. 
+# These are typically classes that SQLAlchemy uses to map objects to database tables. 
+# Each class corresponds to a table in the database, and each attribute represents a column.
 
 from sqlalchemy import Column, Integer, String, Enum, DateTime, JSON,ForeignKey
 from sqlalchemy.orm import relationship

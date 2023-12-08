@@ -37,17 +37,14 @@ Contains Pydantic models that define the structure of requests and responses for
 These models are used for input validation, serialization, and documentation generation. 
 They are usually based on the data models but can be tailored to expose or require different fields when interacting with the API.
 
+To use your FastAPI application with the endpoints you've created, follow this workflow:
+
 activate virtual environment:source FastAPI/myenv/bin/activate
 get into the FastAPI folder and run the app: cd FastAPI uvicorn run:app --reload
 
 access link: http://127.0.0.1:8000/docs
 
-To use your FastAPI application with the endpoints you've created, follow this workflow:
 
-Start your FastAPI server: In your terminal, navigate to the directory where your main.py (or equivalent) is located and run the FastAPI server using Uvicorn. For example:
-
-bash
-Copy code
 uvicorn main:app --reload
 The --reload flag makes the server restart after code changes. Only use this in development.
 
@@ -101,6 +98,18 @@ The IDs point to a collection of sequences from mRNA and ESTs that appear to com
 
 
 {
-  "operation": "intersection",
+  "operation": "union",
   "gene_weaver_ids": [65066, 65243, 65469]
 }
+
+
+{
+  "operation": "difference",
+  "gene_weaver_ids": [65066, 65243]
+}
+
+{
+  "operation": "intersection",
+  "gene_weaver_ids": [65066, 65243]
+}
+
