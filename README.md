@@ -8,6 +8,7 @@ To use this version of FastAPI application, follow this workflow:
 6. Open the .db in the SQLite database to view the tables
 
 Data Parsing:
+Upload gene_export_geneset.txt (in the Sampledataset folder) use the uploaddataset API endpoints to test the functions
 To perform Boolean Algebra analysis on the uploaded dataset using the Boolean Algebra tool:
 1.	Reading the file, extracting the relevant columns (Geneweaver_id, and Unigene), and converting Unigene column into sets of geneset
 Unigene is a database maintained by the National Center for Biotechnology Information for experimental research, which provided a set of non-redundant sequences of genes or expressed sequence tages(ESTs)
