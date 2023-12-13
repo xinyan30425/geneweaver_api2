@@ -123,12 +123,6 @@ class TestCRUD(unittest.TestCase):
     
         self.assertEqual(actual_result_set, expected_result)
 
-        
-        
-        
-        
-        
-
     # def test_update_run_status_and_time(self):
     #     run_id = 1
     #     status = models.RunStatus.RUNNING

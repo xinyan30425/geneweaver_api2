@@ -7,6 +7,8 @@ To use this version of FastAPI application, follow this workflow:
 5. a .db file will be created automatically after run the app
 6. Open the .db in the SQLite database to view the tables
 
+![](FastAPI/Readme_image/Picture1.png)
+
 Data Parsing:
 Upload gene_export_geneset.txt (in the Sampledataset folder) use the uploaddataset API endpoints to test the functions
 To perform Boolean Algebra analysis on the uploaded dataset using the Boolean Algebra tool:
@@ -47,6 +49,27 @@ Each entry in this table is linked to a specific run ID from the AnalysisRun tab
 End of Run Updates: 
 The AnalysisRun table is updated with the 'end time' of the run, and the run status is changed to 'completed'. 
 If there were any issues, the status could reflect an 'error' state, and additional error information could be stored if necessary.
+
+Upload local dataset
+![](FastAPI/Readme_image/Picture2.png)
+
+Get geneset by ID
+![](FastAPI/Readme_image/Picture3.png)
+![](FastAPI/Readme_image/Picture4.png)
+
+Perform a single Boolean Algebra Analysis, user will input the analysis tool (union/intersection/differnce) and the geneweaver_id
+![](FastAPI/Readme_image/Picture5.png)
+
+Get analysis run status by Run ID
+![](FastAPI/Readme_image/Picture6.png)
+
+Get analysis run result by Run ID
+![](FastAPI/Readme_image/Picture7.png)
+
+
+
+
+
 
 
 
