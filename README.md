@@ -23,8 +23,8 @@ To use this version of FastAPI application, follow this workflow:
 1. Activate the virtual environment: source FastAPI/myenv/bin/activate
 2. Navigate to the FastAPI folder: cd FastAPI
 3. Run the app: uvicorn run:app --reload 
-4. Access the swaggerUI url: http://127.0.0.1:8000/docs
-5. a .db file will be created automatically after run the app
+4. Access the swaggerUI URL: http://127.0.0.1:8000/docs
+5. a .db file will be created automatically after running the app
 6. Open the .db in the SQLite database to view the tables
 
 ![](FastAPI/Readme_image/Picture1.png)
@@ -32,8 +32,8 @@ To use this version of FastAPI application, follow this workflow:
 Data Parsing:
 Upload gene_export_geneset.txt (in the Sampledataset folder) use the uploaddataset API endpoints to test the functions
 To perform Boolean Algebra analysis on the uploaded dataset using the Boolean Algebra tool:
-1.	Reading the file, extracting the relevant columns (Geneweaver_id, and Unigene), and converting Unigene column into sets of geneset
-Unigene is a database maintained by the National Center for Biotechnology Information for experimental research, which provided a set of non-redundant sequences of genes or expressed sequence tages(ESTs)
+1.	Reading the file, extracting the relevant columns (Geneweaver_id, and Unigene), and converting the Unigene column into sets of geneset
+Unigene is a database maintained by the National Center for Biotechnology Information for experimental research, which provides a set of non-redundant sequences of genes or expressed sequence tages(ESTs)
 The Unigene column in the dataset contains a list of identifiers, separated by the pip character "|", which would be split into individual genes to create a set.
 Each identifier in the Unigene column represents a unique cluster of gene expression or sequence data.
 Each ID corresponds to a particular set of gene expression or sequence data that is considered unique within the database. 
@@ -43,8 +43,8 @@ Researchers and bioinformaticians use these identifiers to access data, perform 
 2.	Converting the set datatype to json to be stored in the SQLite database
 3.	Boolean Algebra analysis will be performed on the Unigene column data, as the set of genes for each GeneWeaver ID.
 4.	Prepare "BooleanAlgebraInput" instances for each Boolean algebra operation will be performed.
-5.	This will include specifying the operation type (Union, intersection, difference) and providing the list of gene sets to process
-6.	Running the analysis: instance the Boolean algebra tool, perform the analysis, and return the result.
+    This will include specifying the operation type (Union, intersection, difference) and providing the list of gene sets to process
+5.	Running the analysis: instance the Boolean algebra tool, perform the analysis, and return the result.
 
 Database:
 We are creating three tables that are stored in the database:
