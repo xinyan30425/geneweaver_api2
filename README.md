@@ -32,7 +32,7 @@ To use this version of FastAPI application, follow this workflow:
 Data Parsing:
 Upload gene_export_geneset.txt (in the Sampledataset folder) use the uploaddataset API endpoints to test the functions
 To perform Boolean Algebra analysis on the uploaded dataset using the Boolean Algebra tool:
-1.	Reading the file, extracting the relevant columns (Geneweaver_id, and Unigene), and converting the Unigene column into sets of geneset
+1.	Reading the file, extracting the relevant columns (Geneweaver_id, and Unigene), and converting the Unigene column into sets of geneset.
 Unigene is a database maintained by the National Center for Biotechnology Information for experimental research, which provides a set of non-redundant sequences of genes or expressed sequence tages(ESTs)
 The Unigene column in the dataset contains a list of identifiers, separated by the pip character "|", which would be split into individual genes to create a set.
 Each identifier in the Unigene column represents a unique cluster of gene expression or sequence data.
@@ -40,18 +40,18 @@ Each ID corresponds to a particular set of gene expression or sequence data that
 Data are grouped based on sequence similarity, which implies that they may represent the same gene or similar genes.
 Researchers and bioinformaticians use these identifiers to access data, perform comparative analyses, and study the functions and relationships of genes across different species.
 
-2.	Converting the set datatype to json to be stored in the SQLite database
+2.	Converting the set datatype to json to be stored in the SQLite database.
 3.	Boolean Algebra analysis will be performed on the Unigene column data, as the set of genes for each GeneWeaver ID.
 4.	Prepare "BooleanAlgebraInput" instances for each Boolean algebra operation will be performed.
-    This will include specifying the operation type (Union, intersection, difference) and providing the list of gene sets to process
+    This will include specifying the operation type (Union, intersection, difference) and providing the list of gene sets to process.
 5.	Running the analysis: instance the Boolean algebra tool, perform the analysis, and return the result.
 
 Database:
 We are creating three tables that are stored in the database:
 
-Genesets table: store the input dataset in the database
-AnalysisRun table: store the analysis run ID, run status, start time, end time
-The AnalysisResult table is used to store the analysis results for each run
+Genesets table: store the input dataset in the database.
+AnalysisRun table: store the analysis run ID, run status, start time, end time.
+The AnalysisResult table is used to store the analysis results for each run.
 
 From Genesets table to AnalysisRun table: 
 When a new analysis task is initiated, the application will reference the Genesets table to retrieve the necessary data. 
