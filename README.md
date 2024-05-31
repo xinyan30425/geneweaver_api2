@@ -19,6 +19,8 @@ https://docs.google.com/document/d/1jNBsGh9B5vaEgp9MgfxTOLZ2PymoVEgEvToO7adcIAE/
 Software Design Documentation - COMPLETED BY 11/13/2023: 
 https://docs.google.com/document/d/1WdLCj7MD1JzKI8Ehyf17oXpsJt1j9FNiS3Uky8RF9VE/edit?usp=sharing
 
+# Work below are individual contribution
+
 To use this version of FastAPI application, follow this workflow:
 1. Activate the virtual environment: source FastAPI/myenv/bin/activate
 2. Navigate to the FastAPI folder: cd FastAPI
@@ -28,7 +30,7 @@ To use this version of FastAPI application, follow this workflow:
 6. Open the .db in the SQLite database to view the tables
 
 ![](FastAPI/Readme_image/Picture1.png)
-# Work below are individual contribution
+
 Data Parsing:
 Upload gene_export_geneset.txt (in the Sampledataset folder) use the uploaddataset API endpoints to test the functions
 To perform Boolean Algebra analysis on the uploaded dataset using the Boolean Algebra tool:
