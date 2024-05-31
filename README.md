@@ -28,7 +28,7 @@ To use this version of FastAPI application, follow this workflow:
 6. Open the .db in the SQLite database to view the tables
 
 ![](FastAPI/Readme_image/Picture1.png)
-
+# Work below are individual contribution
 Data Parsing:
 Upload gene_export_geneset.txt (in the Sampledataset folder) use the uploaddataset API endpoints to test the functions
 To perform Boolean Algebra analysis on the uploaded dataset using the Boolean Algebra tool:
