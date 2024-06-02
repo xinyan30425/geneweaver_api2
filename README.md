@@ -106,14 +106,6 @@ Update end time and status when complete
 Example AnalysisRunResult Table
 <img width="295" alt="image" src="https://github.com/xinyan30425/geneweaver_api2/assets/91167901/b4505b4a-a19d-4cae-89b0-a0127d5d45e3">
 
-# Simultaneuos multithreading-Initiate analysis task
-POST: Create a new entry to track the analysis process when a new analysis task is initiated
-![image](https://github.com/xinyan30425/geneweaver_api2/assets/91167901/b4211f72-02c1-487e-bda4-1608ccad7d90)
-
-
-
-
-
 
 
 
