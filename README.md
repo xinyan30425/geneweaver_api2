@@ -82,7 +82,7 @@ Get geneset by ID
 ![](FastAPI/Readme_image/Picture3.png)
 ![](FastAPI/Readme_image/Picture4.png)
 
-Perform a single Boolean Algebra Analysis, user will input the analysis tool (union/intersection/differnce) and the geneweaver_id
+Perform a single Boolean Algebra Analysis, users will input the analysis tool (union/intersection/difference) and the geneweaver_id
 ![](FastAPI/Readme_image/Picture5.png)
 
 Get analysis run status by Run ID
@@ -90,6 +90,28 @@ Get analysis run status by Run ID
 
 Get analysis run result by Run ID
 ![](FastAPI/Readme_image/Picture7.png)
+
+# Simultaneuos multithreading-SQLite
+Example Geneset Table:
+<img width="461" alt="image" src="https://github.com/xinyan30425/geneweaver_api2/assets/91167901/7b7a7872-38fd-41cf-bcc2-fc944cbbcb23">
+Geneset table will retrieve necessary data from genesets
+
+Example AnalysisRunStatus Table
+<img width="290" alt="image" src="https://github.com/xinyan30425/geneweaver_api2/assets/91167901/56c0d3d9-985f-4502-afa6-8490f99ea870">
+New entry:
+include a unique run ID and the status will be set to 'pending' or 'running'.
+Update on the progress recorded by updating the run status
+Update end time and status when complete
+
+Example AnalysisRunResult Table
+<img width="295" alt="image" src="https://github.com/xinyan30425/geneweaver_api2/assets/91167901/b4505b4a-a19d-4cae-89b0-a0127d5d45e3">
+
+# Simultaneuos multithreading-Initiate analysis task
+POST: Create a new entry to track the analysis process when a new analysis task is initiated
+![image](https://github.com/xinyan30425/geneweaver_api2/assets/91167901/b4211f72-02c1-487e-bda4-1608ccad7d90)
+
+
+
 
 
 
