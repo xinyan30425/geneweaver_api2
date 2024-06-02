@@ -21,7 +21,8 @@ https://docs.google.com/document/d/1WdLCj7MD1JzKI8Ehyf17oXpsJt1j9FNiS3Uky8RF9VE/
 
 # Work below are individual contribution
 UML diagram:
-![image](https://github.com/xinyan30425/geneweaver_api2/assets/91167901/26b4d561-2a19-44be-9e00-c3db48fac806)
+![Task Management App (1)](https://github.com/xinyan30425/geneweaver_api2/assets/91167901/524ad25e-0b96-402c-aa84-fca0f29f7d7b)
+
 
 To use this version of FastAPI application, follow this workflow:
 1. Activate the virtual environment: source FastAPI/myenv/bin/activate
