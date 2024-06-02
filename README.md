@@ -20,6 +20,8 @@ Software Design Documentation - COMPLETED BY 11/13/2023:
 https://docs.google.com/document/d/1WdLCj7MD1JzKI8Ehyf17oXpsJt1j9FNiS3Uky8RF9VE/edit?usp=sharing
 
 # Work below are individual contribution
+UML diagram:
+![image](https://github.com/xinyan30425/geneweaver_api2/assets/91167901/26b4d561-2a19-44be-9e00-c3db48fac806)
 
 To use this version of FastAPI application, follow this workflow:
 1. Activate the virtual environment: source FastAPI/myenv/bin/activate
