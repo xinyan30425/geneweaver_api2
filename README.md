@@ -1,5 +1,5 @@
 # geneweaver_api2
-Course Project: GeneWeaver via the Jackson Laboratory
+Capstone Project: GeneWeaver via the Jackson Laboratory
 
 Team Proposal - COMPLETED BY 10/23: 
 https://docs.google.com/document/d/17qEHeylFt6ThuapZygZXUNvLmzfzNjj2rC1PpV2iTvk/edit?usp=sharing
